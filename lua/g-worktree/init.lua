@@ -65,11 +65,8 @@ local function _create_worktree_job(path, branch)
 	}):sync()
 
 	if status ~= 0 then
-		vim.print(stdout)
 		return false
 	end
-
-	vim.print(stdout)
 
 	return true
 end
@@ -153,7 +150,7 @@ M.switch_worktree = function(branch_name)
 	end
 
 	if M._config.change_dir_after_create then
-		vim.cmd("cd " .. worktree_path)
+		vim.cmd("cd " .. wt_path)
 	end
 	if M._config.post_create_cmd then
 		vim.cmd(M._config.post_create_cmd)

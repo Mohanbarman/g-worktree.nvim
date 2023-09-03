@@ -8,6 +8,19 @@ local action_state = require("telescope.actions.state")
 local action_set = require("telescope.actions.set")
 local g_worktree = require("g-worktree")
 
+local remove_worktree = function(buf)
+	actions.close(buf)
+	local selected = action_state.get_selected_entry(buf)
+	local delete_confirm = vim.fn.input("Do you want to delete this branch permanently ? [y/N]: ")
+
+	if delete_confirm ~= "y" then
+		return
+	end
+
+	vim.print(" \n")
+	g_worktree.remove_worktree(selected.display)
+end
+
 local git_worktree_list = function(opts)
 	opts = opts or {}
 	local wt_list_output = utils.get_os_command_output({ "git", "worktree", "list" })
@@ -36,11 +49,13 @@ local git_worktree_list = function(opts)
 			attach_mappings = function(_, map)
 				action_set.select:replace(function(buf)
 					local selection = action_state.get_selected_entry(buf)
-					actions.close(buf)
 					if selection ~= nil then
+						actions.close(buf)
 						g_worktree.switch_worktree(selection.display)
 					end
 				end)
+				map("i", "<c-d>", remove_worktree)
+				map("n", "<c-d>", remove_worktree)
 				return true
 			end,
 		})
